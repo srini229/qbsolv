@@ -325,7 +325,7 @@ double tabu_search(int8_t *solution, int8_t *best, uint qubo_size, double **qubo
                     float Delta_E = (float)(new_energy - best_energy);
                     new_energy = evaluate_1bit(Vlastchange, bit, solution, qubo_size, (const double **)qubo,
                                                flip_cost);  // flip the bit and fix tables
-                    printf("\t tabu iter : %lu new energy : %f\n", num_tabu_inner_eval++, new_energy);
+                    printf("\t tabu iter : %lu new energy : %f nTabu : %d\n", num_tabu_inner_eval++, new_energy, nTabu);
                     Vlastchange = local_search_1bit(new_energy, solution, qubo_size, qubo, flip_cost,
                                                     bit_flips);  // local search to polish the change
                     val_index_sort_ns(index, flip_cost,
