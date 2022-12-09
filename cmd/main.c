@@ -35,7 +35,7 @@ void print_qubo_format(void);
 FILE *outFile_;
 FILE *solution_input_;
 int maxNodes_, nCouplers_, nNodes_, findMax_, numsolOut_;
-int Verbose_, TargetSet_, WriteMatrix_, Tlist_;
+int Verbose_, TargetSet_, WriteMatrix_, Tlist_, SubQuboTlist_;
 char *outFileNm_, pgmName_[16], algo_[4];
 double **val;
 double Target_, Time_;
@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
     Time_ = 2592000;  // the maximum runtime of the algorithm in seconds before timeout (2592000 = a month's worth of
                       // seconds)
     Tlist_ = -1;      // tabu list length  -1 signals go with defaults
+    SubQuboTlist_ = -1;
     int64_t seed = 17932241798878;
     int errorCount = 0;
 
@@ -107,7 +108,7 @@ int main(int argc, char *argv[]) {
         use_dwave = true;
     }
 
-    while ((opt = getopt_long(argc, argv, "Hhi:o:v:VS:T:l:n:wmo:t:qr:a:", longopts, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "Hhi:o:v:VS:T:l:p:n:wmo:t:qr:a:", longopts, &option_index)) != -1) {
         switch (opt) {
             case 'a':
                 strcpy(algo_, optarg);  // algorithm copied off of command line -a option
@@ -140,6 +141,9 @@ int main(int argc, char *argv[]) {
                 break;
             case 'l':
                 Tlist_ = strtol(optarg, &chx, 10);  // this sets the length of the tabu list
+                break;
+            case 'p':
+                SubQuboTlist_ = strtol(optarg, &chx, 10);  // this sets the length of the tabu list for subqubo
                 break;
             case 'm':
                 findMax_ = true;  // go for the maximum value otherwise the minimum is found by default

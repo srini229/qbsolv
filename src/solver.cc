@@ -262,6 +262,7 @@ double tabu_search(int8_t *solution, int8_t *best, uint qubo_size, double **qubo
 
     // setup nTabu
     // these nTabu numbers might need to be adjusted to work correctly
+    bool subq = false;
     if (nTabu == 0) {  // nTabu not specified on call
         if (Tlist_ != -1) {
             nTabu = MIN(Tlist_, (int)qubo_size + 1);  // tabu use set tenure
@@ -283,6 +284,19 @@ double tabu_search(int8_t *solution, int8_t *best, uint qubo_size, double **qubo
             else /*qubo_size >= 8000*/
                 nTabu = 35;
         }
+    } else {
+      subq = true;
+      if (SubQuboTlist_ != -1) nTabu = MIN(SubQuboTlist_, (int)qubo_size + 1);  // tabu use set tenure
+    }
+
+    static int nTabuPrinted = 0;
+    if (nTabuPrinted == 0 && (Tlist_ != -1)) {
+      printf("Using nTabu : %d\n", nTabu);
+      ++nTabuPrinted;
+    }
+    if (nTabuPrinted <= 1 && subq && (SubQuboTlist_ != -1)) {
+      printf("Using nTabu in subqubo : %d\n", nTabu);
+      ++nTabuPrinted;
     }
 
     sign = findMax_ ? 1.0 : -1.0;
@@ -298,7 +312,7 @@ double tabu_search(int8_t *solution, int8_t *best, uint qubo_size, double **qubo
 
     int kk, kkstr = 0, kkend = qubo_size, kkinc;
     uint bit_cycle_1 = qubo_size, bit_cycle_2 = qubo_size, bit_cycle = 0;
-    static size_t num_tabu_inner_eval{0};
+    size_t num_tabu_inner_eval{0};
     while (*bit_flips < iter_max) {
         // best solution in neighbour, initialized most negative number
         double neighbour_best = BIGNEGFP;
@@ -325,7 +339,7 @@ double tabu_search(int8_t *solution, int8_t *best, uint qubo_size, double **qubo
                     float Delta_E = (float)(new_energy - best_energy);
                     new_energy = evaluate_1bit(Vlastchange, bit, solution, qubo_size, (const double **)qubo,
                                                flip_cost);  // flip the bit and fix tables
-                    printf("\t tabu iter : %lu new energy : %f nTabu : %d\n", num_tabu_inner_eval++, new_energy, nTabu);
+                    //printf("\t tabu iter : %lu new energy : %f nTabu : %d\n", num_tabu_inner_eval++, new_energy, nTabu);
                     Vlastchange = local_search_1bit(new_energy, solution, qubo_size, qubo, flip_cost,
                                                     bit_flips);  // local search to polish the change
                     val_index_sort_ns(index, flip_cost,
@@ -765,7 +779,7 @@ void solve(double **qubo, const int qubo_size, int8_t **solution_list, double *e
     DwaveQubo = 0;
 
     size_t num_tabu_eval{0};
-    printf(" iter : %lu energy : %f best_energy : %f\n", num_tabu_eval++, energy, best_energy);
+    //printf(" iter : %lu energy : %f best_energy : %f\n", num_tabu_eval++, energy, best_energy);
     // outer loop begin
     while (ContinueWhile) {
         if (qubo_size > 20 &&
@@ -878,7 +892,7 @@ void solve(double **qubo, const int qubo_size, int8_t **solution_list, double *e
                                   qubo_size, &num_nq_solutions);
         Qbest = &solution_list[Qindex[0]][0];
         best_energy = energy_list[Qindex[0]];
-        printf(" iter : %lu energy : %f best_energy : %f\n", num_tabu_eval++, energy, best_energy);
+        //printf(" iter : %lu energy : %f best_energy : %f\n", num_tabu_eval++, energy, best_energy);
 
         // print_solutions( solution_list,energy_list,solution_counts,num_nq_solutions,qubo_size,Qindex);
         if (result.code == NEW_HIGH_ENERGY_UNIQUE_SOL) {  // better solution

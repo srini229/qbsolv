@@ -27,7 +27,7 @@ struct nodeStr_;
 extern FILE *outFile_;
 extern FILE *solution_input_;
 extern int maxNodes_, nCouplers_, nNodes_, findMax_, start_, numsolOut_;
-extern int Verbose_, TargetSet_, WriteMatrix_, Tlist_;
+extern int Verbose_, TargetSet_, WriteMatrix_, Tlist_, SubQuboTlist_;
 extern char *outFileNm_, pgmName_[16], algo_[4];
 extern double Target_, Time_;
 
